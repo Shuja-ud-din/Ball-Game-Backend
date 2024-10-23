@@ -1,0 +1,40 @@
+version: '3.8'
+
+services:
+  api-server:
+    container_name: ball-game-server
+    build:
+      context: .
+      dockerfile: Dockerfile.dev
+    ports:
+      - '4000:4000'
+    env_file:
+      - .env.development.docker
+    volumes:
+      - .:/usr/src/app
+      - /usr/src/app/node_modules
+    depends_on:
+      - mongo_db
+      - redis
+
+  mongo_db:
+    container_name: ball-game-mongo-db
+    image: mongo:latest
+    restart: always
+    ports:
+      - '2717:27017' # Map port 2717 on host to port 27017 in the container
+    volumes:
+      - mongo_db_ball-game:/data/db
+
+  redis:
+    image: redis:latest
+    container_name: dev-ball-game-redis
+    ports:
+      - '6379:6379'
+
+volumes:
+  mongo_db_ball-game:
+
+networks:
+  app-network:
+    driver: bridge
