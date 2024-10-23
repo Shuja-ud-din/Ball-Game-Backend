@@ -100,52 +100,12 @@
     npm run stop-docker:prod
     ```
 
-### Step 3: 🤖 AI Service Setup
-
-follow these steps to set it up locally:
-
-1. **Create and Activate virtual environment**
-
-   - Navigate into the `ai-service` folder and install the necessary Python dependencies:
-   - For **Windows (Powershell is recommended)**:
-
-     ```bash
-     cd ai-service
-     python -m venv .venv
-     .venv\Scripts\activate
-     ```
-
-   - For **macOS/Linux**:
-     ```bash
-     cd ai-service
-     python3 -m venv .venv
-     source .venv/bin/activate
-     ```
-
-2. **Install AI Service Dependencies:**
-
-   - After installing the dependencies, you can start the AI service using the FastAPI server:
-     ```bash
-     pip install -r requirements.txt
-     ```
-
-3. **Start the AI Service:**
-
-   - After installing the dependencies, you can start the AI service using the FastAPI server:
-     ```bash
-     uvicorn main:app --reload --port 3002
-     ```
-
-4. **Environment Configuration:**
-   - Ensure the AI service URLs and related configurations are set in your `.env.development` or `.env.production` files to allow proper communication with the AI service.
-
 ---
 
 ## 🔄 Additional Commands
 
 - 🚧 **Rebuild & Restart Containers:** `docker-compose up --build`
 - 🗑️ **Remove Containers & Volumes:** `docker-compose down -v`
-- 📝 **Generate or Update `requirements.txt`:** `pip freeze > requirements.txt`
 
 ## 💡 Tips
 
