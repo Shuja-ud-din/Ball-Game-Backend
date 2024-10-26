@@ -5,3 +5,11 @@ declare module 'express-serve-static-core' {
     user: IDecodedToken;
   }
 }
+
+import 'express-session';
+
+declare module 'express-session' {
+  interface SessionData {
+    codeVerifier: string;
+  }
+}

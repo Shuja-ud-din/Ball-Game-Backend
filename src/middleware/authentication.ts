@@ -20,6 +20,6 @@ export const authentication = (req: Request, res: Response, next: NextFunction) 
 
     next();
   } catch (error: any) {
-    return APIResponse.error(res, error?.message || 'Unauthorized', error, StatusCodes.UNAUTHORIZED);
+    return APIResponse.error(res, 'Unauthorized', error, StatusCodes.UNAUTHORIZED);
   }
 };

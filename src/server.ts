@@ -5,6 +5,7 @@ import '@/utils/db';
 import bodyParser from 'body-parser';
 import cors from 'cors';
 import express, { Express } from 'express';
+import session from 'express-session';
 import helmet from 'helmet';
 import path from 'path';
 import { pino } from 'pino';
@@ -18,6 +19,15 @@ import router from './routes/routes';
 
 const logger = pino({ name: 'server start' });
 const app: Express = express();
+
+app.use(
+  session({
+    secret: env.SESSION_SECRET,
+    resave: false,
+    saveUninitialized: true,
+    cookie: { secure: false },
+  })
+);
 
 // Set the application to trust the reverse proxy
 app.set('trust proxy', true);

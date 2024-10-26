@@ -7,10 +7,4 @@ export const userData = [
     password: 'SuperAdmin1122',
     role: UserRoles.ADMIN,
   },
-  {
-    email: 'user@gmail.com',
-    name: 'User',
-    password: 'User1122',
-    role: UserRoles.USER,
-  },
 ];

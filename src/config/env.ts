@@ -26,6 +26,9 @@ export const env = cleanEnv(process.env, {
   JWT_SECRET_KEY: str({ devDefault: testOnly('mySecret') }),
   JWT_EXPIRES_IN: str({ devDefault: testOnly('1d') }),
   BCRYPT_SALT_ROUNDS: num({ devDefault: testOnly(10) }),
+  SESSION_SECRET: str({ devDefault: testOnly('mySecret') }),
+
+  FRONTEND_URL: url({ devDefault: testOnly('http://localhost:5173') }),
 
   // cloudinary
   //   CLOUDINARY_CLOUD_NAME: str({ devDefault: testOnly(''), desc: 'Cloudinary cloud name' }),
@@ -39,4 +42,9 @@ export const env = cleanEnv(process.env, {
 
   // OPENAI
   OPENAI_API_KEY: str({ devDefault: testOnly(''), desc: 'OpenAI API key' }),
+
+  // TWITTER
+  TWITTER_CLIENT_ID: str({ devDefault: testOnly(''), desc: 'Twitter client id' }),
+  TWITTER_CLIENT_SECRET: str({ devDefault: testOnly(''), desc: 'Twitter client secret' }),
+  TWITTER_REDIRECT_URI: str({ devDefault: testOnly(''), desc: 'Twitter redirect uri' }),
 });

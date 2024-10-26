@@ -1,9 +1,9 @@
 import mongoose from 'mongoose';
 
 import { UserRoles, UserStatus } from '@/constants/enums';
-import { IUser } from '@/types/user.types';
+import { IUserDoc } from '@/types/user.types';
 
-const schema = new mongoose.Schema<IUser>(
+const schema = new mongoose.Schema<IUserDoc>(
   {
     name: {
       type: String,

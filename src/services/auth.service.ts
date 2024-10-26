@@ -2,7 +2,7 @@ import bcrypt from 'bcrypt';
 import jwt from 'jsonwebtoken';
 
 import { env } from '@/config/env';
-import { IUser } from '@/types/user.types';
+import { IUserDoc } from '@/types/user.types';
 
 const { JWT_SECRET_KEY, JWT_EXPIRES_IN } = env;
 
@@ -11,8 +11,8 @@ export const hashPassword = async (password: string): Promise<string> => {
 };
 
 export const generateToken = (user: any) => {
-  const payload: Partial<IUser> = {
-    id: user._id.toString(),
+  const payload: Partial<IUserDoc> = {
+    _id: user._id.toString(),
     email: user.email,
   };
 

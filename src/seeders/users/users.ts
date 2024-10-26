@@ -3,7 +3,7 @@ import { UpdateQuery } from 'mongoose';
 import { UserStatus } from '@/constants/enums';
 import { User } from '@/models/user.model';
 import { hashPassword } from '@/services/auth.service';
-import { IUser } from '@/types/user.types';
+import { IUserDoc } from '@/types/user.types';
 
 import { userData } from './userData';
 
@@ -12,7 +12,7 @@ export const seedUsers = async () => {
     console.log('Seeding users...');
 
     await Promise.all(
-      userData.map(async (user: UpdateQuery<IUser>) =>
+      userData.map(async (user: UpdateQuery<IUserDoc>) =>
         User.findOneAndUpdate(
           { email: user.email },
           {
