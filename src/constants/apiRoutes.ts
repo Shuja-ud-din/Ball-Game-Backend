@@ -3,4 +3,5 @@ export const apiRoutes = {
   auth: '/auth',
   users: '/users',
   twitter: '/twitter',
+  me: '/me',
 };

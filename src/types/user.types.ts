@@ -15,6 +15,7 @@ export interface IUserDoc {
 export type IUser = Omit<IUserDoc, 'password' | 'otp'>;
 
 export interface IDecodedToken {
+  _id: any;
   id: string;
   email: string;
   iat: number;
