@@ -46,5 +46,7 @@ export const env = cleanEnv(process.env, {
   // TWITTER
   TWITTER_CLIENT_ID: str({ devDefault: testOnly(''), desc: 'Twitter client id' }),
   TWITTER_CLIENT_SECRET: str({ devDefault: testOnly(''), desc: 'Twitter client secret' }),
+  TWITTER_API_SECRET: str({ devDefault: testOnly(''), desc: 'Twitter api secret' }),
+  TWITTER_API_KEY: str({ devDefault: testOnly(''), desc: 'Twitter api key' }),
   TWITTER_REDIRECT_URI: str({ devDefault: testOnly(''), desc: 'Twitter redirect uri' }),
 });
