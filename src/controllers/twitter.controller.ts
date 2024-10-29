@@ -3,7 +3,7 @@ import { StatusCodes } from 'http-status-codes';
 
 import { env } from '@/config/env';
 import { TwitterToken } from '@/models/twitter.model';
-import { generateTwitterOAuthUrl, postTwitterComment, twitterLogin } from '@/services/twitter.service';
+import { generateTwitterOAuthUrl, getTwitterToken, postTwitterComment, twitterLogin } from '@/services/twitter.service';
 import { APIResponse } from '@/utils/response';
 
 export const getTwitterOAuth = async (req: Request, res: Response) => {
@@ -49,6 +49,23 @@ export const postComment = async (req: Request, res: Response) => {
     await postTwitterComment(comment, tweetId);
 
     return APIResponse.success(res, 'Comment posted successfully');
+  } catch (error: any) {
+    console.log({ error: error });
+
+    return APIResponse.error(
+      res,
+      error?.message || 'Somethig went wrong',
+      error,
+      error?.status || StatusCodes.INTERNAL_SERVER_ERROR
+    );
+  }
+};
+
+export const getTwitterStatus = async (req: Request, res: Response) => {
+  try {
+    await getTwitterToken();
+
+    return APIResponse.success(res, 'Twitter token found', { status: 'active' });
   } catch (error: any) {
     console.log({ error: error });
 

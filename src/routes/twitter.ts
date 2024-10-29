@@ -11,6 +11,7 @@ export const twitterRouter: Router = (() => {
   router.get('/auth', getTwitterOAuth);
   router.get('/callback', twitterCallBack);
   router.post('/comment', authentication, requestValidator(TwitterPostCommentValidation), postComment);
+  router.get('/status', authentication, postComment);
 
   return router;
 })();
