@@ -8,7 +8,7 @@
   "scripts": {
     "dev": "cross-env NODE_ENV=development tsx watch --clear-screen=false src/index.ts | pino-pretty",
     "stage": "cross-env NODE_ENV=staging node dist/index.js",
-    "build": "cross-env NODE_ENV=production.local rimraf dist && tsup ",
+    "build": "cross-env NODE_ENV=production rimraf dist && tsup ",
     "start": "cross-env NODE_ENV=production.local node dist/index.js",
     "seed:dev": "cross-env NODE_ENV=development tsx src/seeders/index.ts | pino-pretty",
     "seed:prod": "cross-env NODE_ENV=production.local tsx src/seeders/index.ts | pino-pretty",
@@ -28,7 +28,7 @@
     "test:dev": "vitest dev",
     "test:cov": "vitest run --coverage",
     "release": "semantic-release",
-    "prepare": "husky"
+    "prepare": "npx husky install"
   },
   "dependencies": {
     "axios": "^1.7.7",
