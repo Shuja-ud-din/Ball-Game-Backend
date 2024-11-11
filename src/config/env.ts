@@ -36,9 +36,8 @@ export const env = cleanEnv(process.env, {
   //   CLOUDINARY_API_SECRET: str({ devDefault: testOnly(''), desc: 'Cloudinary api secret' }),
 
   // REDIS
-  //   REDIS_HOST: str({ devDefault: testOnly('redis') }), // for docker in developmet: 'redis' which is the name of the service in docker-compose.dev.yml otherwise use the
-  // '127.0.0.1'
-  //   REDIS_PORT: num({ devDefault: testOnly(6379) }),
+  REDIS_HOST: str({ devDefault: testOnly('redis') }),
+  REDIS_PORT: num({ devDefault: testOnly(6379) }),
 
   // OPENAI
   OPENAI_API_KEY: str({ devDefault: testOnly(''), desc: 'OpenAI API key' }),
@@ -49,4 +48,7 @@ export const env = cleanEnv(process.env, {
   TWITTER_API_SECRET: str({ devDefault: testOnly(''), desc: 'Twitter api secret' }),
   TWITTER_API_KEY: str({ devDefault: testOnly(''), desc: 'Twitter api key' }),
   TWITTER_REDIRECT_URI: str({ devDefault: testOnly(''), desc: 'Twitter redirect uri' }),
+
+  // SPORTRADER
+  SPORTRADER_API_KEY: str({ devDefault: testOnly(''), desc: 'Sportrader API key' }),
 });
