@@ -1,5 +1,6 @@
 import { StatusCodes } from 'http-status-codes';
 
+import { UserRoles } from '@/constants/enums';
 import { User } from '@/models/user.model';
 import { IUser, TCreateUserService, TGetUserService, TGetUsersService, TUpdateUserService } from '@/types/user.types';
 import { APIError } from '@/utils/APIError';
@@ -77,6 +78,10 @@ export const updateUser: TUpdateUserService = async (id, user) => {
     throw new APIError('User not found', StatusCodes.NOT_FOUND);
   }
 
+  if (existingUser.role === UserRoles.SUPERADMIN) {
+    throw new APIError('Cannot update superadmin', StatusCodes.FORBIDDEN);
+  }
+
   if (user.email) {
     const existingEmail = await User.findOne({ email: user.email });
 
@@ -105,11 +110,17 @@ export const updateUser: TUpdateUserService = async (id, user) => {
 };
 
 export const deleteUser = async (id: string) => {
-  const user = await User.findByIdAndDelete(id);
+  const user = await User.findById(id);
 
   if (!user) {
     throw new APIError('User not found', StatusCodes.NOT_FOUND);
   }
+
+  if (user.role === UserRoles.SUPERADMIN) {
+    throw new APIError('Cannot delete superadmin', StatusCodes.FORBIDDEN);
+  }
+
+  await User.findByIdAndDelete(id);
 
   return user;
 };

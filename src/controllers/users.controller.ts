@@ -12,7 +12,12 @@ export const createUser = async (req: Request, res: Response) => {
 
     return APIResponse.success(res, 'User created successfully', { user }, StatusCodes.CREATED);
   } catch (error: any) {
-    return APIResponse.error(res, error.message, error.status);
+    return APIResponse.error(
+      res,
+      error?.message || 'Somethig went wrong',
+      error,
+      error?.status || StatusCodes.INTERNAL_SERVER_ERROR
+    );
   }
 };
 
@@ -23,7 +28,12 @@ export const getUserById = async (req: Request, res: Response) => {
 
     return APIResponse.success(res, 'User found', { user });
   } catch (error: any) {
-    return APIResponse.error(res, error.message, error.status);
+    return APIResponse.error(
+      res,
+      error?.message || 'Somethig went wrong',
+      error,
+      error?.status || StatusCodes.INTERNAL_SERVER_ERROR
+    );
   }
 };
 
@@ -33,7 +43,12 @@ export const getUsers = async (_req: Request, res: Response) => {
 
     return APIResponse.success(res, 'Users found', { users });
   } catch (error: any) {
-    return APIResponse.error(res, error.message, error.status);
+    return APIResponse.error(
+      res,
+      error?.message || 'Somethig went wrong',
+      error,
+      error?.status || StatusCodes.INTERNAL_SERVER_ERROR
+    );
   }
 };
 
@@ -44,7 +59,12 @@ export const updateUser = async (req: Request, res: Response) => {
 
     return APIResponse.success(res, 'User updated successfully', { user });
   } catch (error: any) {
-    return APIResponse.error(res, error.message, error.status);
+    return APIResponse.error(
+      res,
+      error?.message || 'Somethig went wrong',
+      error,
+      error?.status || StatusCodes.INTERNAL_SERVER_ERROR
+    );
   }
 };
 
@@ -55,7 +75,14 @@ export const deleteUser = async (req: Request, res: Response) => {
 
     return APIResponse.success(res, 'User deleted successfully');
   } catch (error: any) {
-    return APIResponse.error(res, error.message, error.status);
+    console.log({ error: error });
+
+    return APIResponse.error(
+      res,
+      error?.message || 'Somethig went wrong',
+      error,
+      error?.status || StatusCodes.INTERNAL_SERVER_ERROR
+    );
   }
 };
 
@@ -66,7 +93,12 @@ export const blockUser = async (req: Request, res: Response) => {
 
     return APIResponse.success(res, 'User blocked successfully');
   } catch (error: any) {
-    return APIResponse.error(res, error.message, error.status);
+    return APIResponse.error(
+      res,
+      error?.message || 'Somethig went wrong',
+      error,
+      error?.status || StatusCodes.INTERNAL_SERVER_ERROR
+    );
   }
 };
 
@@ -77,6 +109,11 @@ export const activateUser = async (req: Request, res: Response) => {
 
     return APIResponse.success(res, 'User activated successfully');
   } catch (error: any) {
-    return APIResponse.error(res, error.message, error.status);
+    return APIResponse.error(
+      res,
+      error?.message || 'Somethig went wrong',
+      error,
+      error?.status || StatusCodes.INTERNAL_SERVER_ERROR
+    );
   }
 };

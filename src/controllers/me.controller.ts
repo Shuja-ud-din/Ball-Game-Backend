@@ -1,4 +1,5 @@
 import { Request, Response } from 'express';
+import { StatusCodes } from 'http-status-codes';
 
 import { APIResponse } from '@/utils/response';
 
@@ -12,6 +13,11 @@ export const getMe = async (req: Request, res: Response) => {
 
     return APIResponse.success(res, 'User found', { user });
   } catch (error: any) {
-    return APIResponse.error(res, error.message, error.status);
+    return APIResponse.error(
+      res,
+      error?.message || 'Somethig went wrong',
+      error,
+      error?.status || StatusCodes.INTERNAL_SERVER_ERROR
+    );
   }
 };

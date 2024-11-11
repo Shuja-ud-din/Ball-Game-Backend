@@ -2,44 +2,84 @@ import { Request, Response } from 'express';
 import { StatusCodes } from 'http-status-codes';
 
 import { env } from '@/config/env';
-import { TwitterToken } from '@/models/twitter.model';
-import { generateTwitterOAuthUrl, getTwitterToken, postTwitterComment, twitterLogin } from '@/services/twitter.service';
+import { AccountType } from '@/constants/enums';
+import { Twitter } from '@/models/twitter.model';
+import { verifyToken } from '@/services/auth.service';
+import {
+  generateTwitterOAuthUrl,
+  getTwitterAccountsByTypes,
+  postTwitterComment,
+  postTwitterTweet,
+  twitterLogin,
+} from '@/services/twitter.service';
+import { IDecodedToken } from '@/types/user.types';
 import { APIResponse } from '@/utils/response';
 
 export const getTwitterOAuth = async (req: Request, res: Response) => {
-  const { url, codeVerifier: verifier } = await generateTwitterOAuthUrl();
+  try {
+    const { account, token } = req.query;
 
-  req.session['codeVerifier'] = verifier;
+    const user = verifyToken(token as string);
+    req.user = user as IDecodedToken;
 
-  res.redirect(url);
+    const {
+      url,
+      codeVerifier: verifier,
+      state,
+    } = await generateTwitterOAuthUrl({
+      state: account as string,
+    });
+
+    req.session['codeVerifier'] = verifier;
+    req.session['state'] = state;
+
+    res.redirect(url);
+  } catch (error: any) {
+    console.log({ error: error });
+
+    return APIResponse.error(
+      res,
+      error?.message || 'Somethig went wrong',
+      error,
+      error?.status || StatusCodes.INTERNAL_SERVER_ERROR
+    );
+  }
 };
 
 export const twitterCallBack = async (req: Request, res: Response) => {
   const { code } = req.query;
-  const { codeVerifier } = req.session;
+  const { codeVerifier, state } = req.session;
 
-  if (!codeVerifier || !code) {
-    return res.status(StatusCodes.BAD_REQUEST).send('You denied the app or your session expired!');
+  if (!codeVerifier || !code || !state) {
+    return APIResponse.error(res, 'Invalid request', null, StatusCodes.BAD_REQUEST);
   }
 
   const response = await twitterLogin({ code: code as string, codeVerifier: codeVerifier as string });
   req.session.codeVerifier = '';
 
-  const twitterToken = await TwitterToken.findOne();
+  const twitterToken = await Twitter.findOne();
   if (twitterToken) {
+    twitterToken.id = response.id;
+    twitterToken.name = response.name;
+    twitterToken.username = response.username;
+    twitterToken.accountType = state as AccountType;
     twitterToken.accessToken = response.accessToken;
     twitterToken.refreshToken = response.refreshToken;
     twitterToken.expiresIn = response.expiresIn;
     await twitterToken.save();
   } else {
-    await TwitterToken.create({
+    await Twitter.create({
+      id: response.id,
+      name: response.name,
+      username: response.username,
+      accountType: state as AccountType,
       accessToken: response.accessToken,
       refreshToken: response.refreshToken,
       expiresIn: response.expiresIn,
     });
   }
 
-  res.redirect(`${env.FRONTEND_URL}/dashboard`);
+  res.redirect(`${env.FRONTEND_URL}/dashboard/settings`);
 };
 
 export const postComment = async (req: Request, res: Response) => {
@@ -61,11 +101,32 @@ export const postComment = async (req: Request, res: Response) => {
   }
 };
 
-export const getTwitterStatus = async (req: Request, res: Response) => {
+export const postTweet = async (req: Request, res: Response) => {
   try {
-    await getTwitterToken();
+    const { tweet } = req.body;
 
-    return APIResponse.success(res, 'Twitter token found', { status: 'active' });
+    await postTwitterTweet(tweet);
+
+    return APIResponse.success(res, 'Tweet posted successfully');
+  } catch (error: any) {
+    console.log({ error: error });
+
+    return APIResponse.error(
+      res,
+      error?.message || 'Somethig went wrong',
+      error,
+      error?.status || StatusCodes.INTERNAL_SERVER_ERROR
+    );
+  }
+};
+
+export const getTwitterAccounts = async (req: Request, res: Response) => {
+  try {
+    const { accountTypes } = req.query;
+
+    const accounts = await getTwitterAccountsByTypes(accountTypes as AccountType[]);
+
+    return APIResponse.success(res, 'Accounts fetched successfully', { accounts });
   } catch (error: any) {
     console.log({ error: error });
 

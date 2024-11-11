@@ -2,8 +2,17 @@ import { StatusCodes } from 'http-status-codes';
 import { TwitterApi } from 'twitter-api-v2';
 
 import { env } from '@/config/env';
-import { TwitterToken } from '@/models/twitter.model';
-import { ITwitterToken, TGenerateTwitterOAuthUrl, TGetTwitterRefreshToken, TTwitterLogin } from '@/types/twitter.types';
+import { Twitter } from '@/models/twitter.model';
+import {
+  ITwitterAccount,
+  TGenerateTwitterOAuthUrl,
+  TGetTwitterAccountsByTypes,
+  TGetTwitterRefreshToken,
+  TGetTwitterToken,
+  TPostTwitterComment,
+  TPostTwitterTweet,
+  TTwitterLogin,
+} from '@/types/twitter.types';
 import { APIError } from '@/utils/APIError';
 
 const TWITTER_REDIRECT_URI = env.TWITTER_REDIRECT_URI;
@@ -18,12 +27,11 @@ const twitterClient = new TwitterApi({
   clientSecret: TWITTER_CLIENT_SECRET,
 });
 
-export const generateTwitterOAuthUrl: TGenerateTwitterOAuthUrl = async () => {
+export const generateTwitterOAuthUrl: TGenerateTwitterOAuthUrl = async (payload) => {
   const { url, codeVerifier, state } = twitterClient.generateOAuth2AuthLink(TWITTER_REDIRECT_URI, {
     scope: SCOPES,
+    state: payload?.state,
   });
-
-  // twitterClient.v2.getActiveTokens()
 
   return { url, codeVerifier, state };
 };
@@ -41,11 +49,16 @@ export const twitterLogin: TTwitterLogin = async ({ codeVerifier, code }) => {
       redirectUri: TWITTER_REDIRECT_URI,
     });
 
-    console.log({ accessToken, refreshToken, expiresIn, loggedClient });
+    const userDetails = await loggedClient.v2.me();
+
+    const { id, name, username } = userDetails.data;
 
     return {
+      id,
+      name,
+      username,
       accessToken,
-      refreshToken,
+      refreshToken: refreshToken as string,
       expiresIn,
     };
   } catch (error: any) {
@@ -71,8 +84,8 @@ export const getTwitterRefreshToken: TGetTwitterRefreshToken = async (twitterRef
   }
 };
 
-export const getTwitterToken = async (): Promise<ITwitterToken> => {
-  const twitterToken = await TwitterToken.findOne().sort({ createdAt: -1 });
+export const getTwitterToken: TGetTwitterToken = async () => {
+  const twitterToken = await Twitter.findOne().sort({ createdAt: -1 });
 
   if (!twitterToken) {
     throw new APIError('No Twitter token found', StatusCodes.NOT_FOUND);
@@ -81,7 +94,7 @@ export const getTwitterToken = async (): Promise<ITwitterToken> => {
   return twitterToken;
 };
 
-export const postTwitterComment = async (comment: string, tweetId: string) => {
+export const postTwitterComment: TPostTwitterComment = async (comment, tweetId) => {
   const twitterToken = await getTwitterToken();
 
   console.log({ twitterToken, TWITTER_API_KEY, TWITTER_API_SECRET });
@@ -96,4 +109,31 @@ export const postTwitterComment = async (comment: string, tweetId: string) => {
   });
 
   return response;
+};
+
+export const postTwitterTweet: TPostTwitterTweet = async (tweet) => {
+  const twitterToken = await getTwitterToken();
+
+  const client = new TwitterApi(twitterToken.accessToken);
+
+  const response = await client.v2.tweet({
+    text: tweet,
+  });
+
+  return response;
+};
+
+export const getTwitterAccountsByTypes: TGetTwitterAccountsByTypes = async (accountTypes) => {
+  const accounts = await Twitter.find({ accountType: { $in: accountTypes } });
+
+  const accountsList: ITwitterAccount[] = accounts.map((account) => {
+    return {
+      id: account.id,
+      name: account.name,
+      username: account.username,
+      accountType: account.accountType,
+    };
+  });
+
+  return accountsList;
 };
