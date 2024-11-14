@@ -29,7 +29,8 @@ export const getGamesOfTheDay: TGetGamesOfTheDay = async () => {
     `/games/${date.getFullYear()}/${date.getMonth() + 1}/${date.getDate()}/schedule.json`
   );
 
-  const expiry = 60 * 60 * 24; // 24 hours
+  // cache the data for (11:59 PM - current time) seconds
+  const expiry = 86400 - (date.getHours() * 3600 + date.getMinutes() * 60 + date.getSeconds());
   redisClient.setEx(cacheKey, expiry, JSON.stringify(data));
 
   return data;
