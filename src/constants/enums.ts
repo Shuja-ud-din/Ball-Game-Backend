@@ -19,3 +19,9 @@ export enum AccountType {
   MIKE = 'mike',
   LARRY = 'larry',
 }
+
+export enum GameStatus {
+  LIVE = 'live',
+  UPCOMING = 'upcoming',
+  COMPLETED = 'completed',
+}

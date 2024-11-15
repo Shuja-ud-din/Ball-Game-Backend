@@ -35,8 +35,8 @@ const schema = new mongoose.Schema<ITwitter>(
       type: String,
       required: true,
     },
-    expiresIn: {
-      type: Number,
+    expiryDate: {
+      type: Date,
       required: true,
     },
   },

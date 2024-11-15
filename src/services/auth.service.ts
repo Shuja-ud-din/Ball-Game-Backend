@@ -1,8 +1,10 @@
 import bcrypt from 'bcrypt';
+import { StatusCodes } from 'http-status-codes';
 import jwt from 'jsonwebtoken';
 
 import { env } from '@/config/env';
 import { IUserDoc } from '@/types/user.types';
+import { APIError } from '@/utils/APIError';
 
 const { JWT_SECRET_KEY, JWT_EXPIRES_IN } = env;
 
@@ -22,7 +24,11 @@ export const generateToken = (user: any) => {
 };
 
 export const verifyToken = (token: string) => {
-  const decoded = jwt.verify(token, JWT_SECRET_KEY);
+  try {
+    const decoded = jwt.verify(token, JWT_SECRET_KEY);
 
-  return decoded;
+    return decoded;
+  } catch (err: any) {
+    throw new APIError('Unauthorized', StatusCodes.UNAUTHORIZED);
+  }
 };

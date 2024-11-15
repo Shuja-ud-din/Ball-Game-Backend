@@ -5,4 +5,5 @@ export const apiRoutes = {
   twitter: '/twitter',
   me: '/me',
   games: '/games',
+  automation: '/automation',
 };

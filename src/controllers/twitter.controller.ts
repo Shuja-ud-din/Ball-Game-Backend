@@ -47,46 +47,57 @@ export const getTwitterOAuth = async (req: Request, res: Response) => {
 };
 
 export const twitterCallBack = async (req: Request, res: Response) => {
-  const { code } = req.query;
-  const { codeVerifier, state } = req.session;
+  try {
+    const { code } = req.query;
+    const { codeVerifier, state } = req.session;
 
-  if (!codeVerifier || !code || !state) {
-    return APIResponse.error(res, 'Invalid request', null, StatusCodes.BAD_REQUEST);
+    if (!codeVerifier || !code || !state) {
+      return APIResponse.error(res, 'Invalid request', null, StatusCodes.BAD_REQUEST);
+    }
+
+    const response = await twitterLogin({ code: code as string, codeVerifier: codeVerifier as string });
+    req.session.codeVerifier = '';
+
+    const twitterToken = await Twitter.findOne({ accountType: state as AccountType });
+    if (twitterToken) {
+      twitterToken.id = response.id;
+      twitterToken.name = response.name;
+      twitterToken.username = response.username;
+      twitterToken.accountType = state as AccountType;
+      twitterToken.accessToken = response.accessToken;
+      twitterToken.refreshToken = response.refreshToken;
+      twitterToken.expiryDate = response.expiryDate;
+      await twitterToken.save();
+    } else {
+      await Twitter.create({
+        id: response.id,
+        name: response.name,
+        username: response.username,
+        accountType: state as AccountType,
+        accessToken: response.accessToken,
+        refreshToken: response.refreshToken,
+        expiryDate: response.expiryDate,
+      });
+    }
+
+    res.redirect(`${env.FRONTEND_URL}/dashboard/settings`);
+  } catch (error: any) {
+    console.log({ error: error });
+
+    return APIResponse.error(
+      res,
+      error?.message || 'Somethig went wrong',
+      error,
+      error?.status || StatusCodes.INTERNAL_SERVER_ERROR
+    );
   }
-
-  const response = await twitterLogin({ code: code as string, codeVerifier: codeVerifier as string });
-  req.session.codeVerifier = '';
-
-  const twitterToken = await Twitter.findOne();
-  if (twitterToken) {
-    twitterToken.id = response.id;
-    twitterToken.name = response.name;
-    twitterToken.username = response.username;
-    twitterToken.accountType = state as AccountType;
-    twitterToken.accessToken = response.accessToken;
-    twitterToken.refreshToken = response.refreshToken;
-    twitterToken.expiresIn = response.expiresIn;
-    await twitterToken.save();
-  } else {
-    await Twitter.create({
-      id: response.id,
-      name: response.name,
-      username: response.username,
-      accountType: state as AccountType,
-      accessToken: response.accessToken,
-      refreshToken: response.refreshToken,
-      expiresIn: response.expiresIn,
-    });
-  }
-
-  res.redirect(`${env.FRONTEND_URL}/dashboard/settings`);
 };
 
 export const postComment = async (req: Request, res: Response) => {
   try {
-    const { comment, tweetId } = req.body;
+    const { comment, tweetId, accountType } = req.body;
 
-    await postTwitterComment(comment, tweetId);
+    await postTwitterComment(comment, tweetId, accountType);
 
     return APIResponse.success(res, 'Comment posted successfully');
   } catch (error: any) {

@@ -2,9 +2,11 @@ import { StatusCodes } from 'http-status-codes';
 import { TwitterApi } from 'twitter-api-v2';
 
 import { env } from '@/config/env';
+import { AccountType } from '@/constants/enums';
 import { Twitter } from '@/models/twitter.model';
 import {
   ITwitterAccount,
+  TFindNBALatestTweet,
   TGenerateTwitterOAuthUrl,
   TGetTwitterAccountsByTypes,
   TGetTwitterRefreshToken,
@@ -59,7 +61,7 @@ export const twitterLogin: TTwitterLogin = async ({ codeVerifier, code }) => {
       username,
       accessToken,
       refreshToken: refreshToken as string,
-      expiresIn,
+      expiryDate: new Date(Date.now() + expiresIn * 1000),
     };
   } catch (error: any) {
     console.log({ error: error });
@@ -84,18 +86,31 @@ export const getTwitterRefreshToken: TGetTwitterRefreshToken = async (twitterRef
   }
 };
 
-export const getTwitterToken: TGetTwitterToken = async () => {
-  const twitterToken = await Twitter.findOne().sort({ createdAt: -1 });
+export const getTwitterToken: TGetTwitterToken = async (accountType = AccountType.MAIN) => {
+  const twitterToken = await Twitter.findOne({
+    accountType: accountType,
+  });
 
   if (!twitterToken) {
-    throw new APIError('No Twitter token found', StatusCodes.NOT_FOUND);
+    throw new APIError('Twitter token not found', StatusCodes.UNAUTHORIZED);
+  }
+
+  // refresh token if expired (1 day before expiry)
+  if (twitterToken.expiryDate.getTime() - Date.now() < 86400000) {
+    const refreshedToken = await getTwitterRefreshToken(twitterToken.refreshToken);
+
+    twitterToken.accessToken = refreshedToken.accessToken;
+    twitterToken.refreshToken = refreshedToken.refreshToken;
+    twitterToken.expiryDate = new Date(Date.now() + refreshedToken.expiresIn * 1000);
+
+    await twitterToken.save();
   }
 
   return twitterToken;
 };
 
-export const postTwitterComment: TPostTwitterComment = async (comment, tweetId) => {
-  const twitterToken = await getTwitterToken();
+export const postTwitterComment: TPostTwitterComment = async (comment, tweetId, accountType) => {
+  const twitterToken = await getTwitterToken(accountType);
 
   console.log({ twitterToken, TWITTER_API_KEY, TWITTER_API_SECRET });
 
@@ -136,4 +151,21 @@ export const getTwitterAccountsByTypes: TGetTwitterAccountsByTypes = async (acco
   });
 
   return accountsList;
+};
+
+export const findNBALatestTweet: TFindNBALatestTweet = async (match) => {
+  const searchQuery = `${match.homeTeam} vs ${match.awayTeam} from:NBA`;
+
+  const twitterToken = await getTwitterToken();
+  const client = new TwitterApi(twitterToken.accessToken);
+
+  const searchResults = await client.v2.search(searchQuery, { max_results: 5 });
+
+  const nbaTweet = searchResults.data?.data?.[0];
+  if (nbaTweet) {
+    console.log(`Found NBA tweet for match : ${nbaTweet.id}`);
+    return nbaTweet;
+  }
+
+  return null;
 };

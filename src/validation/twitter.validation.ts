@@ -12,6 +12,7 @@ export const TWitterGenerateUrlPayloadValidation = Joi.object({
 export const TwitterPostCommentValidation = Joi.object({
   comment: Joi.string().required(),
   tweetId: Joi.string().required(),
+  accountType: Joi.string().valid(...Object.values(AccountType)),
 });
 
 export const TwitterPostTweetValidation = Joi.object({
