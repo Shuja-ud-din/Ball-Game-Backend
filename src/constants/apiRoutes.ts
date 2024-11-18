@@ -6,4 +6,5 @@ export const apiRoutes = {
   me: '/me',
   games: '/games',
   automation: '/automation',
+  private: '/private',
 };
