@@ -1,6 +1,7 @@
 import express, { Router } from 'express';
 
 import {
+  getTwitterAccount,
   getTwitterAccounts,
   getTwitterOAuth,
   postComment,
@@ -23,7 +24,8 @@ export const twitterRouter: Router = (() => {
   router.get('/callback', twitterCallBack);
   router.post('/comment', authentication, requestValidator(TwitterPostCommentValidation), postComment);
   router.post('/tweet', authentication, requestValidator(TwitterPostTweetValidation), postTweet);
-  router.get('/account', authentication, requestValidator(TwitterGetAccountsValidation), getTwitterAccounts);
+  router.get('/account', authentication, requestValidator(TwitterGetAccountsValidation), getTwitterAccount);
+  router.get('/accounts', authentication, getTwitterAccounts);
 
   return router;
 })();

@@ -131,13 +131,39 @@ export const postTweet = async (req: Request, res: Response) => {
   }
 };
 
-export const getTwitterAccounts = async (req: Request, res: Response) => {
+export const getTwitterAccount = async (req: Request, res: Response) => {
   try {
     const { accountType } = req.query;
 
     const account = await getTwitterAccountByType(accountType as AccountType);
 
     return APIResponse.success(res, 'Accounts fetched successfully', { account });
+  } catch (error: any) {
+    console.log({ error: error });
+
+    return APIResponse.error(
+      res,
+      error?.message || 'Somethig went wrong',
+      error,
+      error?.status || StatusCodes.INTERNAL_SERVER_ERROR
+    );
+  }
+};
+
+export const getTwitterAccounts = async (_req: Request, res: Response) => {
+  try {
+    const accounts = await Twitter.find();
+
+    const accountsRes = accounts.map((account) => {
+      return {
+        id: account.id,
+        name: account.name,
+        username: account.username,
+        accountType: account.accountType,
+      };
+    });
+
+    return APIResponse.success(res, 'Accounts fetched successfully', { accounts: accountsRes });
   } catch (error: any) {
     console.log({ error: error });
 
