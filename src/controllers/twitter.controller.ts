@@ -7,7 +7,7 @@ import { Twitter } from '@/models/twitter.model';
 import { verifyToken } from '@/services/auth.service';
 import {
   generateTwitterOAuthUrl,
-  getTwitterAccountsByTypes,
+  getTwitterAccountByType,
   postTwitterComment,
   postTwitterTweet,
   twitterLogin,
@@ -133,11 +133,11 @@ export const postTweet = async (req: Request, res: Response) => {
 
 export const getTwitterAccounts = async (req: Request, res: Response) => {
   try {
-    const { accountTypes } = req.query;
+    const { accountType } = req.query;
 
-    const accounts = await getTwitterAccountsByTypes(accountTypes as AccountType[]);
+    const account = await getTwitterAccountByType(accountType as AccountType);
 
-    return APIResponse.success(res, 'Accounts fetched successfully', { accounts });
+    return APIResponse.success(res, 'Accounts fetched successfully', { account });
   } catch (error: any) {
     console.log({ error: error });
 

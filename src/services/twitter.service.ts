@@ -8,7 +8,7 @@ import {
   ITwitterAccount,
   TFindNBALatestTweet,
   TGenerateTwitterOAuthUrl,
-  TGetTwitterAccountsByTypes,
+  TGetTwitterAccountByType,
   TGetTwitterRefreshToken,
   TGetTwitterToken,
   TPostTwitterComment,
@@ -138,19 +138,23 @@ export const postTwitterTweet: TPostTwitterTweet = async (tweet) => {
   return response;
 };
 
-export const getTwitterAccountsByTypes: TGetTwitterAccountsByTypes = async (accountTypes) => {
-  const accounts = await Twitter.find({ accountType: { $in: accountTypes } });
-
-  const accountsList: ITwitterAccount[] = accounts.map((account) => {
-    return {
-      id: account.id,
-      name: account.name,
-      username: account.username,
-      accountType: account.accountType,
-    };
+export const getTwitterAccountByType: TGetTwitterAccountByType = async (accountType) => {
+  const account = await Twitter.findOne({
+    accountType,
   });
 
-  return accountsList;
+  if (!account) {
+    throw new APIError('Twitter account not found', StatusCodes.NOT_FOUND);
+  }
+
+  const accountRes: ITwitterAccount = {
+    id: account.id,
+    name: account.name,
+    username: account.username,
+    accountType: account.accountType,
+  };
+
+  return accountRes;
 };
 
 export const findNBALatestTweet: TFindNBALatestTweet = async (match) => {

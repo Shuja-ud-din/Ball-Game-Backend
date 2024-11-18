@@ -54,5 +54,5 @@ export type TGetTwitterRefreshToken = (twitterRefreshToken: string) => Promise<I
 export type TGetTwitterToken = (accountType?: AccountType) => Promise<ITwitter>;
 export type TPostTwitterComment = (tweetId: string, comment: string, accountType: AccountType) => Promise<any>;
 export type TPostTwitterTweet = (tweet: string) => Promise<TweetV2PostTweetResult>;
-export type TGetTwitterAccountsByTypes = (accountTypes: AccountType[]) => Promise<ITwitterAccount[]>;
+export type TGetTwitterAccountByType = (accountTypes: AccountType) => Promise<ITwitterAccount>;
 export type TFindNBALatestTweet = (match: IFindNBALatestTweetPayload) => Promise<TweetV2 | null>;

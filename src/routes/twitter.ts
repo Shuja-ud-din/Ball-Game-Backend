@@ -23,7 +23,7 @@ export const twitterRouter: Router = (() => {
   router.get('/callback', twitterCallBack);
   router.post('/comment', authentication, requestValidator(TwitterPostCommentValidation), postComment);
   router.post('/tweet', authentication, requestValidator(TwitterPostTweetValidation), postTweet);
-  router.get('/accounts', authentication, requestValidator(TwitterGetAccountsValidation), getTwitterAccounts);
+  router.get('/account', authentication, requestValidator(TwitterGetAccountsValidation), getTwitterAccounts);
 
   return router;
 })();

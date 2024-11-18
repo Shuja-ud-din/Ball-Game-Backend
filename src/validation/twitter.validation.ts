@@ -20,7 +20,5 @@ export const TwitterPostTweetValidation = Joi.object({
 });
 
 export const TwitterGetAccountsValidation = Joi.object({
-  accountTypes: Joi.array()
-    .items(Joi.string().valid(...Object.values(AccountType)))
-    .required(),
+  accountType: Joi.string().valid(...Object.values(AccountType)),
 });
