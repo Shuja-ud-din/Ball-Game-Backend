@@ -26,7 +26,7 @@ export const getGamesOfTheDay: TGetGamesOfTheDay = async () => {
 
   const date = new Date();
   const { data } = await NBAApi.get<IGetGamesOfTheDayResponse>(
-    `/games/${date.getFullYear()}/${date.getMonth() + 1}/${date.getDate()}/schedule.json`
+    `/games/${date.getFullYear()}/${date.getMonth() + 1}/${date.getDate() - 1}/schedule.json`
   );
 
   // cache the data for (11:59 PM - current time) seconds
