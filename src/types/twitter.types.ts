@@ -41,6 +41,7 @@ export interface ITwitterAccount {
   name: string;
   username: string;
   accountType: AccountType;
+  expiryDate: Date;
 }
 
 export interface IFindNBALatestTweetPayload {

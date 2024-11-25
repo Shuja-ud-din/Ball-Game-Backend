@@ -168,11 +168,18 @@ export const getTwitterAccountByType: TGetTwitterAccountByType = async (accountT
     throw new APIError('Twitter account not found', StatusCodes.NOT_FOUND);
   }
 
+  const expiryDate = new Date(account.expiryDate);
+
+  if (expiryDate.getTime() < Date.now()) {
+    throw new APIError('Twitter account expired', StatusCodes.UNAUTHORIZED);
+  }
+
   const accountRes: ITwitterAccount = {
     id: account.id,
     name: account.name,
     username: account.username,
     accountType: account.accountType,
+    expiryDate: account.expiryDate,
   };
 
   return accountRes;
