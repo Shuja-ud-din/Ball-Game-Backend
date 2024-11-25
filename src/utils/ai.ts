@@ -20,7 +20,12 @@ export const getPersoanlityMessages = (
         {
           role: 'system',
           content:
-            'User will proivde you the text of Twitter tweet, your task is to generate a commment for that tweet.',
+            'User will proivde you the text of Twitter tweet, your task is to generate a commment for that tweet. 50 - 80 characters',
+        },
+        {
+          role: 'system',
+          content:
+            'Generate Unique comments. The comment should be unique and should not be a copy of any other comment.',
         },
       ];
     case AIPersonality.LARRY:
@@ -37,7 +42,12 @@ export const getPersoanlityMessages = (
         {
           role: 'system',
           content:
-            'User will proivde you the text of Twitter tweet, your task is to generate a commment for that tweet.',
+            'User will proivde you the text of Twitter tweet, your task is to generate a commment for that tweet. 50 - 80 characters',
+        },
+        {
+          role: 'system',
+          content:
+            'Generate Unique comments. The comment should be unique and should not be a copy of any other comment.',
         },
       ];
     default:

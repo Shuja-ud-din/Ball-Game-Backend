@@ -9,32 +9,30 @@ import { postTwitterComment, postTwitterTweet } from './twitter.service';
 export const generateAndPostTweet: TGenerateAndPostTweet = async (game) => {
   try {
     const tweet = await generateTweet(game);
+    console.log('Tweet generated:', tweet);
 
     const tweetResponse = await postTwitterTweet(tweet);
     console.log('Tweet posted:', tweetResponse.data);
 
     const { id: tweetId } = tweetResponse.data;
 
-    for (let i = 1; i <= 4; i++) {
-      const commentPostTime = new Date(new Date().getTime() + 60000 * i);
+    for (let i = 0; i < 4; i++) {
+      const commentPostTime = new Date(new Date().getTime() + 15 * 60000 * i); // 15 minutes
 
-      schedule.scheduleJob(
-        commentPostTime,
-        (() => {
-          const currentIndex = i; // Capture the current value of `i`
-          return async () => {
-            try {
-              const comment = await generateComment(game, AIPersonality.MIKE, tweet);
-              await postTwitterComment(comment, tweetId, currentIndex % 2 === 0 ? AccountType.MIKE : AccountType.LARRY);
-              console.log('Comment posted:', comment, currentIndex % 2 === 0 ? 'Mike' : 'Larry');
-            } catch (e) {
-              console.log('Error:', e);
-            }
-          };
-        })()
-      );
+      schedule.scheduleJob(commentPostTime, async () => {
+        try {
+          const comment = await generateComment(game, AIPersonality.MIKE, tweet);
+          console.log('Comment generated:', comment);
+
+          const accountType = i % 2 === 0 ? AccountType.MIKE : AccountType.LARRY;
+          await postTwitterComment(comment, tweetId, accountType);
+          console.log('Comment posted:', comment, accountType === AccountType.MIKE ? 'Mike' : 'Larry');
+        } catch (e) {
+          console.error('Error posting comment:', e);
+        }
+      });
     }
   } catch (e) {
-    console.log('Error:', e);
+    console.error('Error generating and posting tweet:', e);
   }
 };

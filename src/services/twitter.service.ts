@@ -70,6 +70,27 @@ export const twitterLogin: TTwitterLogin = async ({ codeVerifier, code }) => {
   }
 };
 
+export const isTokenValid = async (accountType: AccountType): Promise<boolean> => {
+  try {
+    const twitterToken = await Twitter.findOne({
+      accountType,
+    });
+
+    if (!twitterToken) {
+      return false;
+    }
+
+    const twitterClient = new TwitterApi(twitterToken.accessToken);
+
+    const { data } = await twitterClient.v2.me();
+
+    console.log('Twitter user data:', data);
+    return true;
+  } catch (e) {
+    return false;
+  }
+};
+
 export const getTwitterRefreshToken: TGetTwitterRefreshToken = async (twitterRefreshToken) => {
   try {
     const {
@@ -81,7 +102,7 @@ export const getTwitterRefreshToken: TGetTwitterRefreshToken = async (twitterRef
 
     return { accessToken, refreshToken: refreshToken as string, expiresIn };
   } catch (e: any) {
-    console.log('Error:', e);
+    console.log('Error in refreshing token:', e);
     throw new APIError(e.message || 'Error refreshing Twitter token', StatusCodes.INTERNAL_SERVER_ERROR, e);
   }
 };

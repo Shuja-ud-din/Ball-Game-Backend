@@ -31,7 +31,13 @@ const tweetMessages: OpenAI.Chat.ChatCompletionMessageParam[] = [
   },
   {
     role: 'system',
-    content: 'Your task is to generate a tweet that is insightful and engaging based on the NBA upcoming game.',
+    content:
+      'Your task is to generate a tweet that is insightful and engaging based on the NBA upcoming game. 70 - 100 characters',
+  },
+  {
+    role: 'system',
+    content:
+      'The tweet should be engaging and insightful, and should be related to the NBA upcoming game. The tweet should be unique and should not be a copy of any other tweet.',
   },
 ];
 
@@ -44,8 +50,8 @@ export const generateTweet: TGenerateTweet = async (game) => {
         content: `The ${game.home.name} vs ${game.away.name} game is heating up!`,
       },
     ],
-    max_tokens: 100,
-    temperature: 0.7,
+    max_tokens: 200,
+    temperature: 1.0,
     model: 'gpt-3.5-turbo',
   });
 
@@ -63,8 +69,8 @@ export const generateComment: TGenerateComment = async (game, personality, tweet
         content: `The ${game.home.name} vs ${game.away.name} game is heating up!. Tweet Text: ${tweet}`,
       },
     ],
-    max_tokens: 100,
-    temperature: 0.7,
+    max_tokens: 200,
+    temperature: 1.0,
     model: 'gpt-3.5-turbo',
   });
 
