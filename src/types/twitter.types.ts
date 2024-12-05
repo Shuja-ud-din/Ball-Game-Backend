@@ -20,6 +20,7 @@ export interface ITwitter {
   accountType: AccountType;
   accessToken: string;
   refreshToken: string;
+  configuration: string;
   expiryDate: Date;
 }
 

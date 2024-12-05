@@ -35,6 +35,10 @@ const schema = new mongoose.Schema<ITwitter>(
       type: String,
       required: true,
     },
+    configuration: {
+      type: String,
+      required: false,
+    },
     expiryDate: {
       type: Date,
       required: true,
