@@ -27,6 +27,10 @@ const schema = new mongoose.Schema<ITwitter>(
         message: (props: any) => `${props.value} is not a valid account type`,
       },
     },
+    configuration: {
+      type: String,
+      default: '',
+    },
     accessToken: {
       type: String,
       required: true,

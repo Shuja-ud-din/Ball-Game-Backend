@@ -18,6 +18,7 @@ export interface ITwitter {
   name: string;
   username: string;
   accountType: AccountType;
+  configuration?: string;
   accessToken: string;
   refreshToken: string;
   expiryDate: Date;
@@ -40,6 +41,7 @@ export interface ITwitterAccount {
   id: string;
   name: string;
   username: string;
+  configuration: string;
   accountType: AccountType;
   expiryDate: Date;
 }
