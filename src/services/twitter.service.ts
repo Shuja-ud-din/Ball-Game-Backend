@@ -173,6 +173,7 @@ export const getTwitterAccountByType: TGetTwitterAccountByType = async (accountT
     name: account.name,
     username: account.username,
     accountType: account.accountType,
+    configuration: account.configuration as string,
     expiryDate: account.expiryDate,
   };
 
