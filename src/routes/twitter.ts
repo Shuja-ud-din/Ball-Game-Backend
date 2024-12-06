@@ -1,14 +1,13 @@
 import express, { Router } from 'express';
 
 import {
-  addTwitterConfiguration,
-  editTwitterConfiguration,
   getTwitterAccount,
   getTwitterAccounts,
   getTwitterOAuth,
   postComment,
   postTweet,
   twitterCallBack,
+  updateTwitterConfiguration,
 } from '@/controllers/twitter.controller';
 import { authentication } from '@/middleware/authentication';
 import { requestValidator } from '@/middleware/requestValidator';
@@ -29,18 +28,12 @@ export const twitterRouter: Router = (() => {
   router.post('/tweet', authentication, requestValidator(TwitterPostTweetValidation), postTweet);
   router.get('/account', authentication, requestValidator(TwitterGetAccountsValidation), getTwitterAccount);
   router.get('/accounts', authentication, getTwitterAccounts);
-  router.post(
-    '/add-configuration',
-    authentication,
-    requestValidator(TwitterConfigurationValidation),
-    addTwitterConfiguration
-  );
 
   router.put(
-    '/edit-configuration',
+    '/account/configuration',
     authentication,
     requestValidator(TwitterConfigurationValidation),
-    editTwitterConfiguration
+    updateTwitterConfiguration
   );
   return router;
 })();

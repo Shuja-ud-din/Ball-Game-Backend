@@ -176,56 +176,13 @@ export const getTwitterAccounts = async (_req: Request, res: Response) => {
   }
 };
 
-export const addTwitterConfiguration = async (req: Request, res: Response) => {
+export const updateTwitterConfiguration = async (req: Request, res: Response) => {
   try {
     const { accountType, configuration } = req.body;
 
-    if (!accountType || !configuration) {
-      return APIResponse.error(res, 'Account type and configuration are required', null, StatusCodes.BAD_REQUEST);
-    }
+    await updateTwitterConfiguration(accountType, configuration);
 
-    const account = await Twitter.findOne({ accountType });
-    if (!account) {
-      return APIResponse.error(res, 'Account not found', null, StatusCodes.NOT_FOUND);
-    }
-
-    if (account.configuration) {
-      return APIResponse.error(res, 'Configuration already exists for this account', null, StatusCodes.CONFLICT);
-    }
-
-    account.configuration = configuration;
-    await account.save();
-
-    return APIResponse.success(res, 'Configuration added successfully', { account });
-  } catch (error: any) {
-    console.log({ error: error });
-
-    return APIResponse.error(
-      res,
-      error?.message || 'Something went wrong',
-      error,
-      error?.status || StatusCodes.INTERNAL_SERVER_ERROR
-    );
-  }
-};
-
-export const editTwitterConfiguration = async (req: Request, res: Response) => {
-  try {
-    const { accountType, configuration } = req.body;
-
-    if (!accountType || !configuration) {
-      return APIResponse.error(res, 'Account type and configuration are required', null, StatusCodes.BAD_REQUEST);
-    }
-
-    const account = await Twitter.findOne({ accountType });
-    if (!account) {
-      return APIResponse.error(res, 'Account not found', null, StatusCodes.NOT_FOUND);
-    }
-
-    account.configuration = configuration;
-    await account.save();
-
-    return APIResponse.success(res, 'Configuration updated successfully', { account });
+    return APIResponse.success(res, 'Configuration updated successfully');
   } catch (error: any) {
     console.log({ error: error });
 
