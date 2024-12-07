@@ -197,7 +197,7 @@ export const findNBALatestTweet: TFindNBALatestTweet = async (match) => {
   return null;
 };
 
-export const updateTwitterConfiguration = async (accountType: AccountType, configuration: string) => {
+export const updateConfiguration = async (accountType: AccountType, configuration: string) => {
   const twitterToken = await Twitter.findOne({
     accountType,
   });

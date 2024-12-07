@@ -6,6 +6,7 @@ import {
   getTwitterOAuth,
   postComment,
   postTweet,
+  testAiResponses,
   twitterCallBack,
   updateTwitterConfiguration,
 } from '@/controllers/twitter.controller';
@@ -35,5 +36,8 @@ export const twitterRouter: Router = (() => {
     requestValidator(TwitterConfigurationValidation),
     updateTwitterConfiguration
   );
+
+  router.get('/accounts/test', authentication, testAiResponses);
+
   return router;
 })();

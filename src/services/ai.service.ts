@@ -1,9 +1,11 @@
 import OpenAI from 'openai';
 
 import { env } from '@/config/env';
-import { GameStatus } from '@/constants/enums';
+import { AccountType, AIPersonality, GameStatus } from '@/constants/enums';
 import { TGenerateComment, TGenerateTweet } from '@/types/ai.types';
 import { getPersoanlityMessages } from '@/utils/ai';
+
+import { getTwitterAccountByType } from './twitter.service';
 
 const { OPENAI_API_KEY } = env;
 
@@ -29,9 +31,15 @@ const tweetMessages: OpenAI.Chat.ChatCompletionMessageParam[] = [
 ];
 
 export const generateTweet: TGenerateTweet = async (game) => {
+  const account = await getTwitterAccountByType(AccountType.MAIN);
+
   const data = await openai.chat.completions.create({
     messages: [
       ...tweetMessages,
+      {
+        role: 'system',
+        content: `Your Personality: ${account.configuration}`,
+      },
       {
         role: 'user',
         content: `The ${game.home.name} vs ${game.away.name} game is heating up!`,
@@ -46,11 +54,18 @@ export const generateTweet: TGenerateTweet = async (game) => {
 };
 
 export const generateComment: TGenerateComment = async (game, personality, tweet) => {
+  const account = await getTwitterAccountByType(
+    personality === AIPersonality.MIKE ? AccountType.MIKE : AccountType.LARRY
+  );
   const messages: OpenAI.Chat.ChatCompletionMessageParam[] = getPersoanlityMessages(personality, GameStatus.UPCOMING);
 
   const data = await openai.chat.completions.create({
     messages: [
       ...messages,
+      {
+        role: 'system',
+        content: `Your Personality: ${account.configuration}`,
+      },
       {
         role: 'user',
         content: `The ${game.home.name} vs ${game.away.name} game is heating up!. Tweet Text: ${tweet}`,
