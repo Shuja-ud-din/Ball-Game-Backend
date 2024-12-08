@@ -37,7 +37,7 @@ export const twitterRouter: Router = (() => {
     updateTwitterConfiguration
   );
 
-  router.get('/accounts/test', authentication, testAiResponses);
+  router.post('/accounts/test', authentication, testAiResponses);
 
   return router;
 })();

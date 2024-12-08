@@ -225,7 +225,7 @@ export const testAiResponses = async (req: Request, res: Response) => {
       });
     }
 
-    return APIResponse.success(res, 'Test successful', { responses });
+    return APIResponse.success(res, 'Responses Generated', { responses });
   } catch (error: any) {
     console.log({ error: error });
 
