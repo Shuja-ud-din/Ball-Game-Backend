@@ -196,3 +196,19 @@ export const findNBALatestTweet: TFindNBALatestTweet = async (match) => {
 
   return null;
 };
+
+export const updateConfiguration = async (accountType: AccountType, configuration: string) => {
+  const twitterToken = await Twitter.findOne({
+    accountType,
+  });
+
+  if (!twitterToken) {
+    throw new APIError('Twitter account not found', StatusCodes.NOT_FOUND);
+  }
+
+  twitterToken.configuration = configuration;
+
+  await twitterToken.save();
+
+  return twitterToken;
+};

@@ -6,11 +6,14 @@ import {
   getTwitterOAuth,
   postComment,
   postTweet,
+  testAiResponses,
   twitterCallBack,
+  updateTwitterConfiguration,
 } from '@/controllers/twitter.controller';
 import { authentication } from '@/middleware/authentication';
 import { requestValidator } from '@/middleware/requestValidator';
 import {
+  TwitterConfigurationValidation,
   TWitterGenerateUrlPayloadValidation,
   TwitterGetAccountsValidation,
   TwitterPostCommentValidation,
@@ -26,6 +29,15 @@ export const twitterRouter: Router = (() => {
   router.post('/tweet', authentication, requestValidator(TwitterPostTweetValidation), postTweet);
   router.get('/account', authentication, requestValidator(TwitterGetAccountsValidation), getTwitterAccount);
   router.get('/accounts', authentication, getTwitterAccounts);
+
+  router.put(
+    '/account/configuration',
+    authentication,
+    requestValidator(TwitterConfigurationValidation),
+    updateTwitterConfiguration
+  );
+
+  router.get('/accounts/test', authentication, testAiResponses);
 
   return router;
 })();

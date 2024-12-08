@@ -22,3 +22,8 @@ export const TwitterPostTweetValidation = Joi.object({
 export const TwitterGetAccountsValidation = Joi.object({
   accountType: Joi.string().valid(...Object.values(AccountType)),
 });
+
+export const TwitterConfigurationValidation = Joi.object({
+  accountType: Joi.string().valid(...Object.values(AccountType)),
+  configuration: Joi.string().required(),
+});

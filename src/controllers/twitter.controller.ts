@@ -2,16 +2,20 @@ import { Request, Response } from 'express';
 import { StatusCodes } from 'http-status-codes';
 
 import { env } from '@/config/env';
-import { AccountType } from '@/constants/enums';
+import { AccountType, AIPersonality } from '@/constants/enums';
 import { Twitter } from '@/models/twitter.model';
+import { generateComment, generateTweet } from '@/services/ai.service';
 import { verifyToken } from '@/services/auth.service';
+import { getGamesOfTheDay } from '@/services/games.service';
 import {
   generateTwitterOAuthUrl,
   getTwitterAccountByType,
   postTwitterComment,
   postTwitterTweet,
   twitterLogin,
+  updateConfiguration,
 } from '@/services/twitter.service';
+import { IAIResponse } from '@/types/ai.types';
 import { IDecodedToken } from '@/types/user.types';
 import { APIResponse } from '@/utils/response';
 
@@ -170,6 +174,64 @@ export const getTwitterAccounts = async (_req: Request, res: Response) => {
     return APIResponse.error(
       res,
       error?.message || 'Somethig went wrong',
+      error,
+      error?.status || StatusCodes.INTERNAL_SERVER_ERROR
+    );
+  }
+};
+
+export const updateTwitterConfiguration = async (req: Request, res: Response) => {
+  try {
+    const { accountType, configuration } = req.body;
+
+    await updateConfiguration(accountType, configuration);
+
+    return APIResponse.success(res, 'Configuration updated successfully');
+  } catch (error: any) {
+    console.log({ error: error });
+
+    return APIResponse.error(
+      res,
+      error?.message || 'Something went wrong',
+      error,
+      error?.status || StatusCodes.INTERNAL_SERVER_ERROR
+    );
+  }
+};
+
+export const testAiResponses = async (req: Request, res: Response) => {
+  try {
+    const { games } = await getGamesOfTheDay();
+
+    const responses: IAIResponse[] = [];
+
+    for (const game of games) {
+      const tweet = await generateTweet(game);
+
+      const comments: IAIResponse['comments'] = [];
+
+      for (let i = 0; i < 4; i++) {
+        const response = await generateComment(game, i % 2 === 0 ? AIPersonality.MIKE : AIPersonality.LARRY, tweet);
+        comments.push({
+          comment: response,
+          personality: i % 2 === 0 ? AIPersonality.MIKE : AIPersonality.LARRY,
+        });
+      }
+
+      responses.push({
+        accountType: AccountType.MAIN,
+        tweet,
+        comments,
+      });
+    }
+
+    return APIResponse.success(res, 'Test successful', { responses });
+  } catch (error: any) {
+    console.log({ error: error });
+
+    return APIResponse.error(
+      res,
+      error?.message || 'Something went wrong',
       error,
       error?.status || StatusCodes.INTERNAL_SERVER_ERROR
     );
