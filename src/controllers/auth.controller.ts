@@ -1,17 +1,21 @@
+import { UserStatus } from '@prisma/client';
 import bcrypt from 'bcrypt';
 import { Request, Response } from 'express';
 import { StatusCodes } from 'http-status-codes';
 
-import { UserStatus } from '@/constants/enums';
-import { User } from '@/models/user.model';
 import { generateToken } from '@/services/auth.service';
+import { prismaClient } from '@/utils/db';
 import { APIResponse } from '@/utils/response';
 
 export const login = async (req: Request, res: Response) => {
   try {
     const { email, password } = req.body;
 
-    const user = await User.findOne({ email });
+    const user = await prismaClient.user.findUnique({
+      where: {
+        email,
+      },
+    });
 
     if (!user) {
       return APIResponse.error(res, 'User not found', null, StatusCodes.NOT_FOUND);

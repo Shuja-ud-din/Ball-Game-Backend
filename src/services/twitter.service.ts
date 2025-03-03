@@ -1,9 +1,8 @@
+import { AccountType } from '@prisma/client';
 import { StatusCodes } from 'http-status-codes';
 import { TwitterApi } from 'twitter-api-v2';
 
 import { env } from '@/config/env';
-import { AccountType } from '@/constants/enums';
-import { Twitter } from '@/models/twitter.model';
 import {
   ITwitterAccount,
   TFindNBALatestTweet,
@@ -16,6 +15,7 @@ import {
   TTwitterLogin,
 } from '@/types/twitter.types';
 import { APIError } from '@/utils/APIError';
+import { prismaClient } from '@/utils/db';
 
 const TWITTER_REDIRECT_URI = env.TWITTER_REDIRECT_URI;
 const CLIENT_ID = env.TWITTER_CLIENT_ID;
@@ -72,8 +72,10 @@ export const twitterLogin: TTwitterLogin = async ({ codeVerifier, code }) => {
 
 export const isTokenValid = async (accountType: AccountType): Promise<boolean> => {
   try {
-    const twitterToken = await Twitter.findOne({
-      accountType,
+    const twitterToken = await prismaClient.twitter.findFirst({
+      where: {
+        accountType,
+      },
     });
 
     if (!twitterToken) {
@@ -108,8 +110,10 @@ export const getTwitterRefreshToken: TGetTwitterRefreshToken = async (twitterRef
 };
 
 export const getTwitterToken: TGetTwitterToken = async (accountType = AccountType.MAIN) => {
-  const twitterToken = await Twitter.findOne({
-    accountType: accountType,
+  const twitterToken = await prismaClient.twitter.findFirst({
+    where: {
+      accountType,
+    },
   });
 
   if (!twitterToken) {
@@ -120,11 +124,16 @@ export const getTwitterToken: TGetTwitterToken = async (accountType = AccountTyp
   if (twitterToken.expiryDate.getTime() - Date.now() < 86400000) {
     const refreshedToken = await getTwitterRefreshToken(twitterToken.refreshToken);
 
-    twitterToken.accessToken = refreshedToken.accessToken;
-    twitterToken.refreshToken = refreshedToken.refreshToken;
-    twitterToken.expiryDate = new Date(Date.now() + refreshedToken.expiresIn * 1000);
-
-    await twitterToken.save();
+    await prismaClient.twitter.update({
+      where: {
+        id: twitterToken.id,
+      },
+      data: {
+        accessToken: refreshedToken.accessToken,
+        refreshToken: refreshedToken.refreshToken,
+        expiryDate: new Date(Date.now() + refreshedToken.expiresIn * 1000),
+      },
+    });
   }
 
   return twitterToken;
@@ -160,8 +169,10 @@ export const postTwitterTweet: TPostTwitterTweet = async (tweet) => {
 };
 
 export const getTwitterAccountByType: TGetTwitterAccountByType = async (accountType) => {
-  const account = await Twitter.findOne({
-    accountType,
+  const account = await prismaClient.twitter.findFirst({
+    where: {
+      accountType,
+    },
   });
 
   if (!account) {
@@ -198,8 +209,10 @@ export const findNBALatestTweet: TFindNBALatestTweet = async (match) => {
 };
 
 export const updateConfiguration = async (accountType: AccountType, configuration: string) => {
-  const twitterToken = await Twitter.findOne({
-    accountType,
+  const twitterToken = await prismaClient.twitter.findFirst({
+    where: {
+      accountType,
+    },
   });
 
   if (!twitterToken) {
@@ -208,7 +221,14 @@ export const updateConfiguration = async (accountType: AccountType, configuratio
 
   twitterToken.configuration = configuration;
 
-  await twitterToken.save();
+  await prismaClient.twitter.update({
+    where: {
+      id: twitterToken.id,
+    },
+    data: {
+      configuration,
+    },
+  });
 
   return twitterToken;
 };

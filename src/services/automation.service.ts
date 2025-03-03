@@ -1,6 +1,7 @@
+import { AccountType } from '@prisma/client';
 import schedule from 'node-schedule';
 
-import { AccountType, AIPersonality } from '@/constants/enums';
+import { AIPersonality } from '@/constants/enums';
 import { TGenerateAndPostTweet } from '@/types/automation.types';
 
 import { generateComment, generateTweet } from './ai.service';

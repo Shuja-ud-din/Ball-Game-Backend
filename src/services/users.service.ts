@@ -1,15 +1,19 @@
+import { UserRole } from '@prisma/client';
 import { StatusCodes } from 'http-status-codes';
 
-import { UserRoles } from '@/constants/enums';
-import { User } from '@/models/user.model';
 import { IUser, TCreateUserService, TGetUserService, TGetUsersService, TUpdateUserService } from '@/types/user.types';
 import { APIError } from '@/utils/APIError';
+import { prismaClient } from '@/utils/db';
 
 import { hashPassword } from './auth.service';
 
 export const createUser: TCreateUserService = async (user) => {
   const { email } = user;
-  const existingEmail = await User.findOne({ email });
+  const existingEmail = await prismaClient.user.findUnique({
+    where: {
+      email,
+    },
+  });
 
   if (existingEmail) {
     throw new APIError('Email already exists', StatusCodes.CONFLICT);
@@ -18,10 +22,12 @@ export const createUser: TCreateUserService = async (user) => {
   const hashedPassword = await hashPassword(user.password);
   user.password = hashedPassword;
 
-  const newUser = await User.create(user);
+  const newUser = await prismaClient.user.create({
+    data: user,
+  });
 
   const userReturn: IUser = {
-    _id: newUser._id,
+    id: newUser.id,
     name: newUser.name,
     email: newUser.email,
     role: newUser.role,
@@ -34,14 +40,18 @@ export const createUser: TCreateUserService = async (user) => {
 };
 
 export const getUserById: TGetUserService = async (id) => {
-  const user = await User.findById(id);
+  const user = await prismaClient.user.findUnique({
+    where: {
+      id,
+    },
+  });
 
   if (!user) {
     throw new APIError('User not found', StatusCodes.NOT_FOUND);
   }
 
   const userReturn: IUser = {
-    _id: user._id,
+    id: user.id,
     name: user.name,
     email: user.email,
     role: user.role,
@@ -54,11 +64,11 @@ export const getUserById: TGetUserService = async (id) => {
 };
 
 export const getUsers: TGetUsersService = async () => {
-  const users = await User.find();
+  const users = await prismaClient.user.findMany();
 
   const usersList = users.map((user) => {
     return {
-      _id: user._id,
+      id: user.id,
       name: user.name,
       email: user.email,
       role: user.role,
@@ -72,32 +82,45 @@ export const getUsers: TGetUsersService = async () => {
 };
 
 export const updateUser: TUpdateUserService = async (id, user) => {
-  const existingUser = await User.findById(id);
+  const existingUser = await prismaClient.user.findUnique({
+    where: {
+      id,
+    },
+  });
 
   if (!existingUser) {
     throw new APIError('User not found', StatusCodes.NOT_FOUND);
   }
 
-  if (existingUser.role === UserRoles.SUPERADMIN) {
+  if (existingUser.role === UserRole.SUPERADMIN) {
     throw new APIError('Cannot update superadmin', StatusCodes.FORBIDDEN);
   }
 
   if (user.email) {
-    const existingEmail = await User.findOne({ email: user.email });
+    const existingEmail = await prismaClient.user.findUnique({
+      where: {
+        email: user.email,
+      },
+    });
 
     if (existingEmail) {
       throw new APIError('Email already exists', StatusCodes.CONFLICT);
     }
   }
 
-  const updatedUser = await User.findByIdAndUpdate(id, user);
+  const updatedUser = await prismaClient.user.update({
+    where: {
+      id,
+    },
+    data: user,
+  });
 
   if (!updatedUser) {
     throw new APIError('User not found', StatusCodes.NOT_FOUND);
   }
 
   const userReturn: IUser = {
-    _id: updatedUser._id,
+    id: updatedUser.id,
     name: updatedUser.name,
     email: updatedUser.email,
     role: updatedUser.role,
@@ -110,17 +133,25 @@ export const updateUser: TUpdateUserService = async (id, user) => {
 };
 
 export const deleteUser = async (id: string) => {
-  const user = await User.findById(id);
+  const user = await prismaClient.user.findUnique({
+    where: {
+      id,
+    },
+  });
 
   if (!user) {
     throw new APIError('User not found', StatusCodes.NOT_FOUND);
   }
 
-  if (user.role === UserRoles.SUPERADMIN) {
+  if (user.role === UserRole.SUPERADMIN) {
     throw new APIError('Cannot delete superadmin', StatusCodes.FORBIDDEN);
   }
 
-  await User.findByIdAndDelete(id);
+  await prismaClient.user.delete({
+    where: {
+      id,
+    },
+  });
 
   return user;
 };

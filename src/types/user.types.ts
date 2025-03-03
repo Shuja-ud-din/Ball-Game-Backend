@@ -1,11 +1,11 @@
-import { UserRoles, UserStatus } from '@/constants/enums';
+import { UserRole, UserStatus } from '@prisma/client';
 
 export interface IUserDoc {
-  _id?: string;
+  id: string;
   name: string;
   email: string;
   password: string;
-  role: UserRoles;
+  role: UserRole;
   status: UserStatus;
   otp?: string;
   createdAt: Date;
@@ -15,7 +15,6 @@ export interface IUserDoc {
 export type IUser = Omit<IUserDoc, 'password' | 'otp'>;
 
 export interface IDecodedToken {
-  _id: any;
   id: string;
   email: string;
   iat: number;
@@ -26,7 +25,7 @@ interface ICreateUser {
   name: string;
   email: string;
   password: string;
-  role: UserRoles;
+  role: UserRole;
   status: UserStatus;
 }
 

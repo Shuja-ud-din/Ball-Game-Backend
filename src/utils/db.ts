@@ -1,15 +1,18 @@
-import mongoose from 'mongoose';
+import { PrismaClient } from '@prisma/client';
 
-import { env } from '@/config/env';
 import { logger } from '@/server';
 
-const { MONGO_URL } = env;
+const prismaClient = new PrismaClient();
 
-mongoose
-  .connect(MONGO_URL)
+prismaClient
+  .$connect()
   .then(() => {
-    logger.info('Connected to Mongo DB');
+    logger.info('PostgreSQL connected successfully');
   })
-  .catch((err) => {
-    console.error(err);
+  .catch((error) => {
+    logger.error('PostgreSQL connection failed:');
+    console.error(error);
+    process.exit(1);
   });
+
+export { prismaClient };

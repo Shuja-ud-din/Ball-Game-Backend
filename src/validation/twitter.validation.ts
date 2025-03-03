@@ -1,6 +1,5 @@
+import { AccountType } from '@prisma/client';
 import Joi from 'joi';
-
-import { AccountType } from '@/constants/enums';
 
 export const TWitterGenerateUrlPayloadValidation = Joi.object({
   account: Joi.string()

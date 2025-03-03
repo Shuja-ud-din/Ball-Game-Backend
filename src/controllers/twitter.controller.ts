@@ -1,9 +1,9 @@
+import { AccountType } from '@prisma/client';
 import { Request, Response } from 'express';
 import { StatusCodes } from 'http-status-codes';
 
 import { env } from '@/config/env';
-import { AccountType, AIPersonality } from '@/constants/enums';
-import { Twitter } from '@/models/twitter.model';
+import { AIPersonality } from '@/constants/enums';
 import { generateComment, generateTweet } from '@/services/ai.service';
 import { verifyToken } from '@/services/auth.service';
 import { getGamesOfTheDay } from '@/services/games.service';
@@ -17,6 +17,7 @@ import {
 } from '@/services/twitter.service';
 import { IAIResponse } from '@/types/ai.types';
 import { IDecodedToken } from '@/types/user.types';
+import { prismaClient } from '@/utils/db';
 import { APIResponse } from '@/utils/response';
 
 export const getTwitterOAuth = async (req: Request, res: Response) => {
@@ -62,25 +63,38 @@ export const twitterCallBack = async (req: Request, res: Response) => {
     const response = await twitterLogin({ code: code as string, codeVerifier: codeVerifier as string });
     req.session.codeVerifier = '';
 
-    const twitterToken = await Twitter.findOne({ accountType: state as AccountType });
-    if (twitterToken) {
-      twitterToken.id = response.id;
-      twitterToken.name = response.name;
-      twitterToken.username = response.username;
-      twitterToken.accountType = state as AccountType;
-      twitterToken.accessToken = response.accessToken;
-      twitterToken.refreshToken = response.refreshToken;
-      twitterToken.expiryDate = response.expiryDate;
-      await twitterToken.save();
-    } else {
-      await Twitter.create({
-        id: response.id,
-        name: response.name,
-        username: response.username,
+    const twitterToken = await prismaClient.twitter.findFirst({
+      where: {
         accountType: state as AccountType,
-        accessToken: response.accessToken,
-        refreshToken: response.refreshToken,
-        expiryDate: response.expiryDate,
+      },
+    });
+
+    if (twitterToken) {
+      await prismaClient.twitter.update({
+        where: {
+          id: twitterToken.id,
+        },
+        data: {
+          id: response.id,
+          name: response.name,
+          username: response.username,
+          accountType: state as AccountType,
+          accessToken: response.accessToken,
+          refreshToken: response.refreshToken,
+          expiryDate: response.expiryDate,
+        },
+      });
+    } else {
+      await prismaClient.twitter.create({
+        data: {
+          id: response.id,
+          name: response.name,
+          username: response.username,
+          accountType: state as AccountType,
+          accessToken: response.accessToken,
+          refreshToken: response.refreshToken,
+          expiryDate: response.expiryDate,
+        },
       });
     }
 
@@ -156,7 +170,7 @@ export const getTwitterAccount = async (req: Request, res: Response) => {
 
 export const getTwitterAccounts = async (_req: Request, res: Response) => {
   try {
-    const accounts = await Twitter.find();
+    const accounts = await prismaClient.twitter.findMany();
 
     const accountsRes = accounts.map((account) => {
       return {

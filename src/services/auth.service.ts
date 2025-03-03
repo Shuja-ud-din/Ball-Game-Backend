@@ -14,7 +14,7 @@ export const hashPassword = async (password: string): Promise<string> => {
 
 export const generateToken = (user: any) => {
   const payload: Partial<IUserDoc> = {
-    _id: user._id.toString(),
+    id: user.id,
     email: user.email,
   };
 

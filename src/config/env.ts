@@ -22,18 +22,13 @@ export const env = cleanEnv(process.env, {
   CORS_ORIGIN: str({ devDefault: testOnly('http://localhost:5173;http://localhost:3000') }),
   COMMON_RATE_LIMIT_MAX_REQUESTS: num({ devDefault: testOnly(1000) }),
   COMMON_RATE_LIMIT_WINDOW_MS: num({ devDefault: testOnly(1000) }),
-  MONGO_URL: url({ devDefault: testOnly('mongodb://localhost:27017/ball-game') }),
+  POSTGRES_URL: url({ devDefault: testOnly('postgres://postgres:password@localhost:5432/your_db_name') }),
   JWT_SECRET_KEY: str({ devDefault: testOnly('mySecret') }),
   JWT_EXPIRES_IN: str({ devDefault: testOnly('1d') }),
   BCRYPT_SALT_ROUNDS: num({ devDefault: testOnly(10) }),
   SESSION_SECRET: str({ devDefault: testOnly('mySecret') }),
 
   FRONTEND_URL: url({ devDefault: testOnly('http://localhost:5173') }),
-
-  // cloudinary
-  //   CLOUDINARY_CLOUD_NAME: str({ devDefault: testOnly(''), desc: 'Cloudinary cloud name' }),
-  //   CLOUDINARY_API_KEY: str({ devDefault: testOnly(''), desc: 'Cloudinary api key' }),
-  //   CLOUDINARY_API_SECRET: str({ devDefault: testOnly(''), desc: 'Cloudinary api secret' }),
 
   // REDIS
   REDIS_HOST: str({ devDefault: testOnly('redis') }),

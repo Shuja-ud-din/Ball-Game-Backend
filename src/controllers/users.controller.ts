@@ -1,7 +1,7 @@
+import { UserStatus } from '@prisma/client';
 import { Request, Response } from 'express';
 import { StatusCodes } from 'http-status-codes';
 
-import { UserStatus } from '@/constants/enums';
 import { APIResponse } from '@/utils/response';
 
 import * as userService from '../services/users.service';

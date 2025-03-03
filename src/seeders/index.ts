@@ -1,25 +1,20 @@
-import mongoose from 'mongoose';
-
-import { env } from '@/config/env';
+import { prismaClient } from '@/utils/db';
 
 import { seedUsers } from './users/users';
 
-const { MONGO_URL } = env;
-
 const seedDatabase = async () => {
-  mongoose
-    .connect(MONGO_URL)
+  prismaClient
+    .$connect()
     .then(async () => {
-      console.log('Connected to Mongo DB');
+      console.log('Connected to the database');
       await seedUsers();
-      // await seedPlans();
-      // await seedSubscriptions();
+      process.exit(0);
     })
     .catch((err) => {
       console.log('Something went wrong while seeding'), JSON.stringify(err);
     })
     .finally(() => {
-      mongoose.connection.close();
+      prismaClient.$disconnect();
     });
 };
 

@@ -1,7 +1,8 @@
+import { AccountType } from '@prisma/client';
 import OpenAI from 'openai';
 
 import { env } from '@/config/env';
-import { AccountType, AIPersonality, GameStatus } from '@/constants/enums';
+import { AIPersonality, GameStatus } from '@/constants/enums';
 import { TGenerateComment, TGenerateTweet } from '@/types/ai.types';
 import { getPersoanlityMessages } from '@/utils/ai';
 

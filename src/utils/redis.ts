@@ -26,7 +26,7 @@ const redisClientOptions: RedisClientOptions<RedisModules, RedisFunctions, Redis
       logger.warn(`Redis reconnect attempt ${retries}, retrying in ${delay} ms`);
       return delay;
     },
-    connectTimeout: 10000, // Timeout for the connection in milliseconds
+    connectTimeout: 20000, // Timeout for the connection in milliseconds
   },
 };
 
